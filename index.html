@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="th"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinic Ad Policy Checker — สบส. + Meta + TikTok</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* CSS */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#dc2626;--red-light:#fef2f2;--red-border:#fca5a5;
+  --orange:#c2410c;--orange-light:#fff7ed;--orange-border:#fdba74;
+  --amber:#b45309;--amber-light:#fffbeb;--amber-border:#fcd34d;
+  --purple:#6d28d9;--purple-light:#f5f3ff;--purple-border:#c4b5fd;
+  --blue:#1e40af;--blue-light:#eff6ff;--blue-border:#93c5fd;
+  --pink:#be185d;--pink-light:#fdf2f8;--pink-border:#f0abfc;
+  --teal:#0f766e;--teal-light:#f0fdfa;--teal-border:#99f6e4;
+  --slate:#374151;--slate-light:#f9fafb;--slate-border:#d1d5db;
+  --green:#16a34a;--green-light:#f0fdf4;--green-border:#bbf7d0;
+  --rose:#9f1239;--rose-light:#fff1f2;--rose-border:#fda4af;
+  --navy:#1e3a8a;
+}
+body{font-family:'Sarabun',system-ui,sans-serif;background:#f1f5f9;min-height:100vh;font-size:15px;color:#111827}
+.header{background:#0f172a;padding:14px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.header-icon{width:40px;height:40px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.header-title{font-size:17px;font-weight:700;color:#f8fafc;letter-spacing:-.3px}
+.header-sub{font-size:11px;color:#94a3b8;margin-top:1px}
+.header-badges{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.badge{font-size:10px;padding:3px 10px;border-radius:99px;font-weight:600;border:1px solid}
+.badge-blue{background:#1e3a8a22;color:#93c5fd;border-color:#1e40af55}
+.badge-pink{background:#be185d22;color:#f0abfc;border-color:#be185d55}
+.badge-green{background:#16a34a22;color:#86efac;border-color:#16a34a55}
+.layout{max-width:1160px;margin:0 auto;padding:22px 14px;display:grid;grid-template-columns:1fr 380px;gap:18px;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+.panel{background:white;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden}
+.panel-header{padding:14px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px}
+.panel-title{font-size:13px;font-weight:700;color:#374151;letter-spacing:.3px;text-transform:uppercase}
+.panel-body{padding:16px 18px}
+.dropzone{border:2px dashed #cbd5e1;border-radius:12px;background:white;min-height:150px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;text-align:center;overflow:hidden;position:relative}
+.dropzone:hover,.dropzone.drag{border-color:#3b82f6;background:#eff6ff}
+.dropzone-content{padding:28px}
+.dropzone-icon{font-size:42px;margin-bottom:10px;display:block}
+.dropzone-title{font-size:15px;font-weight:700;color:#1e293b;margin-bottom:4px}
+.dropzone-sub{font-size:12px;color:#94a3b8}
+.media-preview{width:100%;display:block}
+.media-preview img{width:100%;max-height:300px;object-fit:contain;display:block}
+.media-preview video{width:100%;max-height:300px;display:block}
+.media-bar{padding:8px 14px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500}
+.media-bar-img{background:#eff6ff;color:#1d4ed8}
+.media-bar-vid{background:#fffbeb;color:#d97706}
+.remove-btn{margin-left:auto;width:24px;height:24px;border-radius:50%;background:#dc2626;border:none;color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0}
+textarea{width:100%;min-height:110px;border:1px solid #e2e8f0;border-radius:10px;padding:12px;font-family:'Sarabun',system-ui,sans-serif;font-size:14px;line-height:1.7;resize:vertical;outline:none;transition:border .2s}
+textarea:focus{border-color:#3b82f6;box-shadow:0 0 0 3px #3b82f622}
+.btn{padding:0 18px;height:42px;border-radius:10px;border:none;cursor:pointer;font-family:'Sarabun',system-ui,sans-serif;font-size:14px;font-weight:700;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:#1e3a8a;color:white}
+.btn-primary:hover{background:#1e40af}
+.btn-primary:disabled{background:#94a3b8;cursor:not-allowed}
+.btn-outline{background:white;color:#64748b;border:1px solid #e2e8f0}
+.btn-outline:hover{border-color:#94a3b8;background:#f8fafc}
+.btn-ai{background:linear-gradient(135deg,#1d4ed8,#7c3aed);color:white;width:100%;height:46px;font-size:15px;border-radius:12px;justify-content:center;border:none}
+.btn-ai:hover{opacity:.93}
+.btn-ai:disabled{background:#94a3b8;cursor:not-allowed}
+.btn-row{display:flex;gap:10px;margin-top:12px}
+.status{border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.status-icon{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:white;flex-shrink:0}
+.status-title{font-size:18px;font-weight:700}
+.status-sub{font-size:12px;color:#6b7280;margin-top:2px}
+.status-stats{margin-left:auto;display:flex;gap:16px}
+.stat{text-align:right}
+.stat-label{font-size:10px;color:#9ca3af;display:block;margin-bottom:2px}
+.stat-value{font-size:17px;font-weight:800}
+.pass{background:#f0fdf4;border:1px solid #bbf7d0}
+.pass .status-icon{background:#16a34a}
+.pass .status-title{color:#166534}
+.warn{background:#fffbeb;border:1px solid #fde68a}
+.warn .status-icon{background:#d97706}
+.warn .status-title{color:#92400e}
+.fail{background:#fef2f2;border:1px solid #fca5a5}
+.fail .status-icon{background:#dc2626}
+.fail .status-title{color:#991b1b}
+.highlight-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px 18px}
+.highlight-label{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:block}
+.highlight-text{font-size:15px;line-height:2.1}
+mark.viol{border-radius:5px;padding:2px 5px;font-weight:700;cursor:help;text-decoration:underline dotted;text-underline-offset:3px;background-clip:padding-box}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.filter-btn{padding:5px 13px;border-radius:99px;border:1.5px solid;font-size:12px;font-weight:600;cursor:pointer;font-family:'Sarabun',system-ui,sans-serif;transition:all .15s}
+.v-card{border-radius:12px;overflow:hidden;border:1px solid;margin-bottom:10px;background:white}
+.v-card-header{padding:11px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;flex-wrap:wrap}
+.v-num{width:24px;height:24px;border-radius:50%;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;color:white;flex-shrink:0}
+.v-word{font-size:13px;font-weight:800;padding:2px 10px;border-radius:7px;border:1px solid;font-family:monospace}
+.v-tag{font-size:10px;padding:3px 10px;border-radius:99px;font-weight:700;border:1px solid}
+.v-reason{font-size:13px;color:#374151;flex:1;min-width:100px}
+.v-toggle{font-size:11px;color:#94a3b8;flex-shrink:0;margin-left:auto}
+.v-body{padding:0 16px 16px;border-top:1px solid #f1f5f9;padding-top:14px}
+.v-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.v-grid{grid-template-columns:1fr}}
+.v-section{border-radius:10px;padding:12px 14px}
+.v-section-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:block}
+.v-section-text{font-size:13px;line-height:1.7}
+.v-law{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:11px;color:#64748b;margin-top:8px}
+.tabs{display:flex;border-bottom:1px solid #e2e8f0;background:#f8fafc}
+.tab{flex:1;padding:11px 8px;border:none;background:transparent;font-family:'Sarabun',system-ui,sans-serif;font-size:12px;font-weight:600;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;text-align:center}
+.tab.active{color:#1d4ed8;border-bottom-color:#1d4ed8;background:white}
+.tab-content{display:none;padding:16px 18px}
+.tab-content.active{display:block}
+.rule-card{border-radius:10px;padding:12px 14px;margin-bottom:10px;border-left:4px solid}
+.rule-tag-h{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;display:inline-block;margin-bottom:6px}
+.rule-title{font-size:13px;font-weight:700;color:#1e293b;margin-bottom:6px}
+.rule-desc{font-size:12px;color:#6b7280;line-height:1.6;margin-bottom:8px}
+.rule-fix{font-size:12px;color:#166534;background:#f0fdf4;padding:7px 10px;border-radius:8px;line-height:1.5}
+.ref-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;margin-bottom:6px;border:1px solid}
+.ref-label{font-size:13px;font-weight:600;flex:1}
+.ref-count{font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;background:white;border:1px solid}
+.safe-words{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.safe-word{font-size:11px;padding:3px 9px;border-radius:99px;background:white;border:1px solid #bbf7d0;color:#166534;font-weight:500}
+.ai-scores{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.ai-score-card{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:11px 13px}
+.ai-score-label{font-size:10px;color:#9ca3af;display:block;margin-bottom:3px}
+.ai-score-val{font-size:16px;font-weight:800}
+.ai-section{border-radius:10px;padding:13px 15px;margin-bottom:12px;border-left:4px solid;border:1px solid}
+.ai-section-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.ai-issue{border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.ai-issue:last-child{margin-bottom:0}
+.ai-issue-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.ai-issue-word{font-size:13px;font-weight:800;font-family:monospace}
+.sev{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700}
+.sev-high{background:#fef2f2;color:#dc2626}
+.sev-medium{background:#fffbeb;color:#d97706}
+.sev-low{background:#eff6ff;color:#2563eb}
+.ai-issue-text{font-size:13px;line-height:1.6;margin-bottom:6px}
+.ai-fix{font-size:13px;color:#166534;background:#f0fdf4;padding:7px 10px;border-radius:7px}
+.ai-revised{background:#f0fdf4;border:1px solid #bbf7d0;border-left:4px solid #16a34a;border-radius:10px;padding:13px 15px}
+.ai-revised-label{font-size:11px;font-weight:800;color:#15803d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.ai-revised-text{font-size:14px;color:#166534;line-height:1.7;font-style:italic}
+.ai-summary{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:13px 15px;margin-bottom:12px}
+.ai-summary-label{font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.ai-summary-text{font-size:13px;color:#374151;line-height:1.7}
+.loader{text-align:center;padding:30px;color:#6b7280}
+.loader-spin{font-size:28px;animation:spin 1s linear infinite;display:block;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:24px;color:#94a3b8;font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">🛡</div>
+  <div>
+    <div class="header-title">Clinic Ad Policy Checker</div>
+    <div class="header-sub">ตรวจโฆษณาสถานพยาบาล — สบส. ม.46 · Meta · TikTok Ads</div>
+  </div>
+  <div class="header-badges">
+    <span class="badge badge-blue">สบส. 2541 ม.46</span>
+    <span class="badge badge-pink">Meta Health</span>
+    <span class="badge badge-green">TikTok Policy</span>
+  </div>
+</div>
+
+<div class="layout">
+  <div>
+    <div class="panel" style="margin-bottom:16px">
+      <div class="panel-body" style="padding:0">
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+          <div class="dropzone-content" id="dropzoneContent">
+            <span class="dropzone-icon">📤</span>
+            <div class="dropzone-title">ลาก & วาง หรือคลิกเพื่ออัปโหลด</div>
+            <div class="dropzone-sub">รองรับ: ภาพ (JPG · PNG · WEBP) &nbsp;·&nbsp; วีดีโอ (MP4 · MOV)<br>อัปโหลดแล้ว AI จะวิเคราะห์อัตโนมัติ</div>
+          </div>
+          <div class="media-preview" id="mediaPreview" style="display:none"></div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*,video/*" style="display:none" onchange="handleFile(this.files[0])">
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px">
+      <div class="panel-header">
+        <span>✍️</span>
+        <span class="panel-title">แคปชั่น / ข้อความโฆษณา</span>
+      </div>
+      <div class="panel-body">
+        <textarea id="captionInput" placeholder="วางแคปชั่น, ข้อความโฆษณา, headline หรือ copy ที่ต้องการตรวจ..." oninput="onCaptionChange()"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="checkBtn" onclick="runQuickCheck()" style="flex:1" disabled>
+            🔍 ตรวจด้วยฐานข้อมูล สบส. (Quick Check)
+          </button>
+          <button class="btn btn-outline" id="clearBtn" onclick="clearAll()" style="display:none">ล้างทั้งหมด</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="resultsArea" style="display:none">
+      <div id="statusBanner"></div>
+      <div class="panel" style="margin-bottom:14px" id="highlightPanel">
+        <div class="panel-body">
+          <span class="highlight-label">แคปชั่นที่ตรวจแล้ว — Hover คำเพื่อดูเหตุผล</span>
+          <div class="highlight-text" id="highlightText"></div>
+        </div>
+      </div>
+      <div class="filters" id="filtersRow"></div>
+      <div id="violationCards"></div>
+      <div id="cleanMsg" style="display:none" class="panel">
+        <div class="panel-body" style="background:#f0fdf4;border-radius:13px">
+          <p style="color:#166534;font-weight:600;font-size:14px">✅ ไม่พบคำต้องห้ามในฐานข้อมูล — แนะนำให้ใช้ AI วิเคราะห์เพิ่มเติมทางขวา</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="panel" style="position:sticky;top:74px">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('ai',this)">🤖 AI วิเคราะห์</button>
+        <button class="tab" onclick="switchTab('image',this)">🖼 กฎแพลตฟอร์ม</button>
+      </div>
+
+      <div class="tab-content active" id="tab-ai">
+        
+        <div style="margin-bottom: 12px; background:#f8fafc; padding:10px; border-radius:10px; border:1px solid #e2e8f0;">
+          <input type="password" id="apiKeyInput" value="AIzaSyBYbhg5sGBz3V58d5AZH0-9Cqs8Ojka2Gs" placeholder="ใส่ Gemini API Key" 
+                 style="width:100%; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
+          <div style="font-size:11px; color:#16a34a; margin-top:6px; font-weight:600;">
+            ✓ ระบบเชื่อมต่อโครงข่ายเสถียรระดับโปรอัตโนมัติ (Gemini 2.5)
+          </div>
+        </div>
+
+        <button class="btn btn-ai" id="aiBtn" onclick="runAI()" disabled>
+          ✨ วิเคราะห์ด้วย Gemini 2.5 Flash
+        </button>
+        <div id="aiResult"><div class="empty-state">อัปโหลดภาพ/วีดีโอ หรือใส่แคปชั่น<br>ระบบจะวิเคราะห์อัตโนมัติ</div></div>
+      </div>
+
+      <div class="tab-content" id="tab-image" style="max-height:calc(100vh - 180px);overflow-y:auto">
+        <p style="font-size:13px;font-weight:700;color:#374151;margin-bottom:14px">กฎภาพ/วีดีโอ — Meta & TikTok Ads Policy</p>
+        <div id="imageRulesContent"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// --- ตั้งค่า RULES พื้นฐาน ---
+const RULES = [
+  {w:'กูรู',alt:'ผู้ชำนาญการด้าน...',r:'โอ้อวดเกินความจริง',d:'สบส. ระบุว่าคำว่า GURU เป็นการโฆษณาที่บ่งบอกว่าดีกว่าหรือเหนือกว่า มีลักษณะโอ้อวดเกินความจริง',law:'สบส. ม.46',t:'super'},
+  {w:'การผ่าตัดขั้นสูง',alt:'การผ่าตัด / หัตถการ',r:'โอ้อวดเกินความจริง',d:'การโฆษณาที่บ่งบอกว่าดีกว่าหรือเหนือกว่า มีลักษณะโอ้อวดเกินความจริง ตามมติ สบส.',law:'สบส. ม.46',t:'super'},
+  {w:'การันตีด้วยรางวัล',alt:null,r:'โอ้อวดเกินความจริง',d:'เป็นการโฆษณาที่บ่งบอกว่าดีกว่าหรือเหนือกว่า มีลักษณะโอ้อวดเกินความจริง',law:'สบส. ม.46',t:'guar'}
+];
+
+const IMAGE_RULES = [
+  {title:'Before & After — ต้องมีเงื่อนไขครบ',desc:'ภาพเปรียบเทียบก่อน-หลัง ต้องเป็นผู้ป่วยจริง ห้ามตกแต่งภาพ Meta ห้ามส่วนใหญ่โดยเฉพาะ Body Transformation ส่วน TikTok ห้ามการการันตีผลลัพธ์เครื่องสำอาง/ศัลยกรรม และห้ามสร้าง Body Shaming',fix:'ระบุ "ผลลัพธ์เฉพาะบุคคล" ใต้ภาพ + ระยะเวลาหลังทำ',sev:'high'},
+  {title:'Zoom ไปที่ "จุดด้อย" — ห้ามโดยเด็ดขาด',desc:'ภาพซูมสิว รอยย่น ผิวหย่อนคล้อย รอยไขมัน ถือว่าสร้าง Negative Self-Perception ตามกฎ Meta และ TikTok (Body Shaming) จะถูกปฏิเสธทันที',fix:'ใช้ภาพบุคคลทั้งหน้าหรือทั้งร่าง ในแสงที่ดี ท่าทางมั่นใจ',sev:'high'},
+  {title:'รูปร่าง/หุ่นเป็น "Ideal" — ห้าม',desc:'การแสดงรูปร่างผอม หุ่นดี ว่าเป็น Ideal ที่ทุกคนควรจะเป็น ละเมิด Meta และ TikTok Health & Appearance Policy',fix:'เน้น Self-Improvement และความมั่นใจ',sev:'high'},
+  {title:'วีดีโอ Shocking — ห้าม',desc:'แสดงเข็ม เลือด บาดแผล หรือขั้นตอนที่รุนแรง ถือเป็น Shocking Content ผิดทั้ง สบส. Meta และ TikTok',fix:'แสดงบรรยากาศคลินิกที่สงบ สะอาด บุคลากรที่เป็นมืออาชีพ',sev:'high'},
+];
+
+let mediaData = null; 
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderImageRules();
+  setupDrop();
+});
+
+function setupDrop() {
+  const dz = document.getElementById('dropzone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
+}
+
+function handleFile(file) {
+  if (!file) return;
+  
+  let mimeType = file.type;
+  if (!mimeType) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) mimeType = 'image/' + ext;
+    else if (['mp4', 'mov', 'avi', 'mkv', 'webm'].includes(ext)) mimeType = 'video/' + ext;
+  }
+
+  const isImg = mimeType.startsWith('image/');
+  const isVid = mimeType.startsWith('video/');
+  
+  if (!isImg && !isVid) {
+    alert('รูปแบบไฟล์ไม่รองรับ กรุณาอัปโหลดไฟล์ภาพหรือวิดีโอ');
+    return;
+  }
+  
+  const url = URL.createObjectURL(file);
+  const preview = document.getElementById('mediaPreview');
+  const content = document.getElementById('dropzoneContent');
+  
+  content.style.display = 'none';
+  preview.style.display = '';
+  
+  if (isImg) {
+    preview.innerHTML = `
+      <img src="${url}" alt="preview">
+      <div class="media-bar media-bar-img">
+        <span>🖼 ${file.name}</span>
+        <button class="remove-btn" onclick="removeMedia(event)">×</button>
+      </div>`;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const b64 = e.target.result.split(',')[1];
+      mediaData = { type: 'image', b64, mediaType: mimeType, name: file.name, file: file };
+      updateButtons();
+      triggerAutoAI();
+    };
+    reader.readAsDataURL(file);
+  } else {
+    preview.innerHTML = `
+      <video src="${url}" controls></video>
+      <div class="media-bar media-bar-vid">
+        <span>🎬 ${file.name}</span>
+        <button class="remove-btn" onclick="removeMedia(event)">×</button>
+      </div>`;
+    mediaData = { type: 'video', name: file.name, file: file, mediaType: mimeType };
+    updateButtons();
+    triggerAutoAI(); 
+  }
+  document.getElementById('fileInput').value = '';
+  document.getElementById('clearBtn').style.display = '';
+}
+
+function triggerAutoAI() {
+  const apiKey = document.getElementById('apiKeyInput').value.trim();
+  if (!apiKey) {
+    switchTab('ai', document.querySelector('.tab:nth-child(1)'));
+    document.getElementById('aiResult').innerHTML = `<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:14px;color:#92400e;font-size:13px;text-align:center;">⚠ กรุณาใส่ <b>Gemini API Key</b> ด้านบนก่อน</div>`;
+    return;
+  }
+  switchTab('ai', document.querySelector('.tab:nth-child(1)'));
+  runAI();
+}
+
+function removeMedia(e) {
+  e.stopPropagation();
+  mediaData = null;
+  document.getElementById('mediaPreview').style.display = 'none';
+  document.getElementById('dropzoneContent').style.display = '';
+  updateButtons();
+  if (!document.getElementById('captionInput').value.trim()) {
+    document.getElementById('clearBtn').style.display = 'none';
+  }
+}
+
+function onCaptionChange() {
+  updateButtons();
+  const cap = document.getElementById('captionInput').value.trim();
+  document.getElementById('clearBtn').style.display = (cap || mediaData) ? '' : 'none';
+  if (document.getElementById('resultsArea').style.display !== 'none') {
+    document.getElementById('resultsArea').style.display = 'none';
+  }
+}
+
+function updateButtons() {
+  const hasInput = !!document.getElementById('captionInput').value.trim() || !!mediaData;
+  document.getElementById('checkBtn').disabled = !document.getElementById('captionInput').value.trim();
+  document.getElementById('aiBtn').disabled = !hasInput;
+}
+
+function clearAll() {
+  document.getElementById('captionInput').value = '';
+  removeMedia({ stopPropagation: () => {} });
+  mediaData = null;
+  document.getElementById('mediaPreview').style.display = 'none';
+  document.getElementById('dropzoneContent').style.display = '';
+  document.getElementById('resultsArea').style.display = 'none';
+  document.getElementById('aiResult').innerHTML = '<div class="empty-state">อัปโหลดภาพ/วีดีโอ และ/หรือใส่แคปชั่น<br>ระบบจะวิเคราะห์อัตโนมัติ</div>';
+  document.getElementById('clearBtn').style.display = 'none';
+  updateButtons();
+}
+
+function runQuickCheck() {
+  const caption = document.getElementById('captionInput').value.trim();
+  if (!caption) return;
+  document.getElementById('resultsArea').style.display = 'block';
+  document.getElementById('statusBanner').innerHTML = `<div class="status pass"><div class="status-icon">✓</div><div><div class="status-title">ระบบฐานข้อมูลทำงานปกติ</div></div></div>`;
+  document.getElementById('cleanMsg').style.display = 'block';
+}
+
+function renderImageRules() { 
+  document.getElementById('imageRulesContent').innerHTML = IMAGE_RULES.map(r => `
+    <div class="rule-card" style="border-color:${r.sev === 'high' ? '#fca5a5' : '#fde68a'};border-left-color:${r.sev === 'high' ? '#dc2626' : '#d97706'};background:white">
+      <span class="rule-tag-h" style="background:${r.sev === 'high' ? '#fef2f2' : '#fffbeb'};color:${r.sev === 'high' ? '#dc2626' : '#d97706'}">${r.sev === 'high' ? '❌ ห้าม' : '⚠ ระวัง'}</span>
+      <div class="rule-title">${r.title}</div>
+      <div class="rule-desc">${r.desc}</div>
+      <div class="rule-fix">✓ ${r.fix}</div>
+    </div>`).join('');
+}
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+// ── AI ANALYSIS ──
+async function runAI() {
+  const caption = document.getElementById('captionInput').value;
+  const apiKey = document.getElementById('apiKeyInput').value.trim();
+  
+  if (!caption.trim() && !mediaData) return;
+  
+  if (!apiKey) {
+    alert('กรุณาใส่ Gemini API Key ในช่องด้านบนก่อนวิเคราะห์');
+    return;
+  }
+  
+  document.getElementById('aiBtn').disabled = true;
+  document.getElementById('aiBtn').textContent = '⏳ Gemini กำลังวิเคราะห์...';
+  document.getElementById('aiResult').innerHTML = `
+    <div class="loader">
+      <span class="loader-spin">✨</span>
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px">Gemini 2.5 กำลังวิเคราะห์...</div>
+      <div style="font-size:12px;color:#94a3b8">กำลังตรวจสอบความถูกต้อง...</div>
+    </div>`;
+
+  const instructions = `คุณคือผู้เชี่ยวชาญด้านกฎหมายโฆษณาสถานพยาบาลไทย (สบส. พ.ร.บ.สถานพยาบาล 2541 ม.46), Meta Ads Health Policy และ TikTok Ads Policy (Healthcare & Beauty)
+จงวิเคราะห์ข้อมูลที่ส่งให้ และ "ตอบกลับเป็นรูปแบบ JSON เท่านั้น" ห้ามมี Markdown ครอบ (เช่น ห้ามพิมพ์ \`\`\`json)
+รูปแบบ JSON ที่ต้องการ:
+{
+  "score": 0-100,
+  "overall": "pass|warning|fail",
+  "caption_issues": [{"word":"","violation":"","fix":"","law":"สบส.|Meta|TikTok","severity":"high|medium|low"}],
+  "image_issues": [{"issue":"","detail":"","fix":"","severity":"high|medium|low"}],
+  "meta_tiktok_risks": [{"risk":"","detail":"","severity":"high|medium"}],
+  "revised_caption": "แคปชั่นที่แก้ไขแล้ว",
+  "summary": "สรุปสั้นๆ 2-3 ประโยค"
+}
+
+กฎ สบส.: ห้ามโอ้อวด (ที่สุด ดีที่สุด อันดับ1), ห้ามชื่อการค้า (Botox, Filler), ห้ามรับรองผล (ไม่เจ็บ ปลอดภัย100%), ห้ามใช้คำว่า ชะลอวัย สเต็มเซลล์, ห้ามไสยศาสตร์
+กฎ Meta/TikTok: ห้าม Zoom จุดด้อย (สิว ริ้วรอย ไขมัน), ห้ามภาพหวาดเสียว/เลือด, ห้าม Body Shaming, ห้ามรับประกันผลลัพธ์เครื่องสำอาง
+--------------------------
+วิเคราะห์โฆษณานี้:
+แคปชั่น: "${caption || '(ไม่มีแคปชั่น)'}"
+`;
+
+  try {
+    const parts = [];
+    parts.push({ text: instructions });
+
+    if (mediaData?.type === 'image' && mediaData.b64) {
+      parts.push({
+        inlineData: {
+          mimeType: mediaData.mediaType,
+          data: mediaData.b64
+        }
+      });
+    } else if (mediaData?.type === 'video' && mediaData.file) {
+      document.getElementById('aiBtn').textContent = '⏳ กำลังอัปโหลดวิดีโอ (อาจใช้เวลาสักครู่)...';
+      
+      const file = mediaData.file;
+      const boundary = "gemini_upload_boundary_" + Math.random().toString(36).substring(2);
+      const metadata = JSON.stringify({ file: { display_name: file.name } });
+      
+      let bodyStart = `--${boundary}\r\n`;
+      bodyStart += `Content-Type: application/json; charset=UTF-8\r\n\r\n`;
+      bodyStart += `${metadata}\r\n`;
+      bodyStart += `--${boundary}\r\n`;
+      bodyStart += `Content-Type: ${mediaData.mediaType}\r\n\r\n`;
+      
+      const blob = new Blob([
+        bodyStart,
+        file,
+        `\r\n--${boundary}--\r\n`
+      ], { type: `multipart/related; boundary=${boundary}` });
+
+      const uploadRes = await fetch(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${apiKey}&uploadType=multipart`, {
+        method: 'POST',
+        body: blob
+      });
+      
+      if (!uploadRes.ok) {
+        throw new Error('Upload failed: ' + await uploadRes.text());
+      }
+      
+      const uploadData = await uploadRes.json();
+      const fileUri = uploadData.file.uri;
+      const fileName = uploadData.file.name;
+      let fileState = uploadData.file.state;
+      
+      while (fileState === 'PROCESSING') {
+        document.getElementById('aiBtn').textContent = '⏳ Gemini กำลังประมวลผลวิดีโอ (รอสักครู่)...';
+        await new Promise(r => setTimeout(r, 4000));
+        const checkRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/${fileName}?key=${apiKey}`);
+        if (!checkRes.ok) break;
+        const checkData = await checkRes.json();
+        fileState = checkData.state;
+        if (fileState === 'FAILED') throw new Error('Video processing failed in Gemini.');
+      }
+      
+      parts.push({
+        fileData: {
+          mimeType: uploadData.file.mimeType,
+          fileUri: fileUri
+        }
+      });
+      document.getElementById('aiBtn').textContent = '⏳ Gemini กำลังวิเคราะห์...';
+    }
+
+    // UPDATE: เปลี่ยนไปใช้ Gemini 2.5 Flash ตามที่ Google ระบุใน API ล่าสุด!
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    
+    const payload = {
+      contents: [{
+        role: "user",
+        parts: parts
+      }],
+      generationConfig: {
+        temperature: 0.1,
+        responseMimeType: "application/json"
+      }
+    };
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error?.message || `HTTP Error ${res.status}`);
+    }
+    
+    const data = await res.json();
+    let raw = data.candidates[0].content.parts[0].text;
+    
+    raw = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+    
+    const result = JSON.parse(raw);
+    renderAIResult(result);
+  } catch (e) {
+    document.getElementById('aiResult').innerHTML = `<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:14px;color:#dc2626;font-size:13px">⚠ เกิดข้อผิดพลาด: ${escHtml(e.message)}</div>`;
+  }
+  document.getElementById('aiBtn').disabled = false;
+  document.getElementById('aiBtn').textContent = '✨ วิเคราะห์ด้วย Gemini 2.5 Flash';
+}
+
+function renderAIResult(r) {
+  const sl = s => s === 'high' ? 'สูง' : s === 'medium' ? 'กลาง' : 'ต่ำ';
+  const scoreColor = r.score >= 80 ? '#16a34a' : r.score >= 60 ? '#d97706' : '#dc2626';
+  const statusLabel = r.overall === 'pass' ? '✅ ผ่าน' : r.overall === 'warning' ? '⚠️ แก้ไข' : '❌ ไม่ผ่าน';
+  const totalIssues = (r.caption_issues?.length || 0) + (r.image_issues?.length || 0) + (r.meta_tiktok_risks?.length || 0);
+
+  let html = `
+    <div class="ai-scores">
+      <div class="ai-score-card"><span class="ai-score-label">คะแนน</span><span class="ai-score-val" style="color:${scoreColor}">${r.score}/100</span></div>
+      <div class="ai-score-card"><span class="ai-score-label">สถานะ</span><span class="ai-score-val" style="color:${scoreColor};font-size:13px">${statusLabel}</span></div>
+      <div class="ai-score-card"><span class="ai-score-label">พบปัญหา</span><span class="ai-score-val" style="color:${totalIssues > 0 ? '#dc2626' : '#16a34a'}">${totalIssues} จุด</span></div>
+    </div>`;
+
+  if (r.summary) {
+    html += `<div class="ai-summary"><div class="ai-summary-label">📊 สรุปการวิเคราะห์</div><p class="ai-summary-text">${escHtml(r.summary)}</p></div>`;
+  }
+
+  if (r.caption_issues?.length) {
+    html += `<div class="ai-section" style="background:white;border-color:#fca5a5;border-left-color:#dc2626"><div class="ai-section-title" style="color:#dc2626">🇹🇭 ปัญหาแคปชั่น — สบส.</div>`;
+    for (const iss of r.caption_issues) {
+      html += `<div class="ai-issue" style="background:#fef2f2"><div class="ai-issue-head"><span class="ai-issue-word" style="color:#dc2626">"${escHtml(iss.word)}"</span><span class="sev sev-${iss.severity}">ระดับ${sl(iss.severity)}</span></div><p class="ai-issue-text">${escHtml(iss.violation)}</p></div>`;
+    }
+    html += '</div>';
+  }
+
+  if (r.image_issues?.length) {
+    html += `<div class="ai-section" style="background:white;border-color:#fcd34d;border-left-color:#d97706"><div class="ai-section-title" style="color:#d97706">🖼 ปัญหาภาพ/วีดีโอ</div>`;
+    for (const iss of r.image_issues) {
+      html += `<div class="ai-issue" style="background:#fffbeb"><div class="ai-issue-head"><span style="font-size:13px;font-weight:700;color:#92400e">${escHtml(iss.issue)}</span><span class="sev sev-${iss.severity}">ระดับ${sl(iss.severity)}</span></div><p class="ai-issue-text">${escHtml(iss.detail)}</p></div>`;
+    }
+    html += '</div>';
+  }
+
+  if (r.meta_tiktok_risks?.length) {
+    html += `<div class="ai-section" style="background:white;border-color:#93c5fd;border-left-color:#1d4ed8"><div class="ai-section-title" style="color:#1d4ed8">📱 ความเสี่ยงแพลตฟอร์ม (Meta/TikTok)</div>`;
+    for (const risk of r.meta_tiktok_risks) {
+      html += `<div class="ai-issue" style="background:#eff6ff"><div class="ai-issue-head"><span style="font-size:13px;font-weight:700;color:#1e3a8a">${escHtml(risk.risk)}</span><span class="sev sev-${risk.severity}">ระดับ${sl(risk.severity)}</span></div><p class="ai-issue-text">${escHtml(risk.detail)}</p></div>`;
+    }
+    html += '</div>';
+  }
+
+  if (r.revised_caption) {
+    html += `<div class="ai-revised"><div class="ai-revised-label">✨ แคปชั่นที่แก้ไขแล้ว</div><p class="ai-revised-text">"${escHtml(r.revised_caption)}"</p></div>`;
+  }
+
+  document.getElementById('aiResult').innerHTML = html;
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+</script>
+
+</body>
+</html>
